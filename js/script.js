@@ -24,3 +24,12 @@ if (!localStorage.getItem('difficulty')) {
     }
   });
 }
+
+const dirts = document.querySelectorAll('.dirt');
+const moles = document.querySelectorAll('.mole');
+
+function showMole(dirts) {
+  console.log(dirts);
+}
+
+showMole(dirts);
