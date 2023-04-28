@@ -10,6 +10,50 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <div class="popup d-none" id="popup">
+      <div class="popup-container text-center">
+        <h2>Difficulty</h2>
+        <div class="difficulties">
+          <div
+            class="difficulty"
+            role="button"
+            tabindex="1"
+            data-difficulty="easy"
+          >
+            <h3>Easy</h3>
+          </div>
+          <div
+            class="difficulty"
+            role="button"
+            tabindex="2"
+            data-difficulty="medium"
+          >
+            <h3>Medium</h3>
+          </div>
+          <div
+            class="difficulty"
+            role="button"
+            tabindex="3"
+            data-difficulty="hard"
+          >
+            <h3>Hard</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="information">
+      <ul>
+        <li>Difficulty : <span id="difficulty">Medium</span></li>
+        <li>High Score : <span id="high-score">15</span></li>
+        <li>Score : <span id="score">6</span></li>
+      </ul>
+    </div>
+
+    <div id="start" role="button" tabindex="1">
+      <p class="text-center">START</p>
+    </div>
+
     <h1 class="title text-center">Whack A Mole</h1>
 
     <div class="container">
