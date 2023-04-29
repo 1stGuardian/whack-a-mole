@@ -44,15 +44,28 @@ const startCountdown = () => {
   });
 };
 
-const showMole = (dirts) => {
-  const randomMole = Math.floor(Math.random() * dirts.length);
-  const randomSpeed = Math.random();
-  const randomTime = Math.floor(Math.random() * (3 + 1)) * 1000;
+const getRandomDirt = (dirts) => {
+  [...dirts].filter((e) => !e.classList.contains('mole-show-up'));
+  const randomNum = Math.floor(Math.random() * dirts.length);
+  return dirts[randomNum];
+};
 
-  moles[randomMole].style.transition = `top ${randomSpeed}s`;
-  moles[randomMole].classList.add('mole-show-up');
+const getRandomMoleSpeed = () => Math.random();
+
+const getRandomMoleAppearTime = (min, max) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
+
+const showMole = () => {
+  const randomDirt = getRandomDirt(dirts);
+  const randomSpeed = getRandomMoleSpeed();
+  const randomTime = getRandomMoleAppearTime(100, 1000);
+
+  randomDirt.style.transition = `top ${randomSpeed}s`;
+  randomDirt.classList.add('mole-show-up');
+  console.log(randomDirt, randomSpeed, randomTime);
   setTimeout(() => {
-    moles[randomMole].classList.remove('mole-show-up');
+    randomDirt.classList.remove('mole-show-up');
+    if (isStarted) showMole();
   }, randomTime);
 };
 
@@ -84,9 +97,9 @@ startButton.addEventListener('click', async function () {
   await setDelay(250);
   startButton.classList.add('d-none');
   await startCountdown();
+  showMole();
   setTimeout(() => {
     isStarted = false;
     startButton.classList.remove('d-none');
   }, 15000);
-  showMole(dirts);
 });
