@@ -20,6 +20,10 @@ const setScore = (score) => {
   localStorage.setItem(difficulty, score);
 };
 
+const setDelay = (delay) => {
+  return new Promise((resolve) => setTimeout(() => resolve(), delay));
+};
+
 const startCountdown = () => {
   return new Promise((resolve) => {
     let int = 3;
@@ -57,8 +61,9 @@ if (!localStorage.getItem('difficulty')) {
   const difficulties = document.querySelector('.difficulties');
   popup.classList.remove('d-none');
 
-  difficulties.addEventListener('click', function (e) {
+  difficulties.addEventListener('click', async function (e) {
     if (e.target.tagName === 'H3') {
+      await setDelay(250);
       setDifficulty(e.target.parentElement.dataset.difficulty);
 
       localStorage.setItem('easy', 0);
@@ -76,6 +81,7 @@ let score = 0;
 
 startButton.addEventListener('click', async function () {
   isStarted = true;
+  await setDelay(250);
   startButton.classList.add('d-none');
   await startCountdown();
   setTimeout(() => {
