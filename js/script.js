@@ -20,8 +20,33 @@ const setScore = (score) => {
   localStorage.setItem(difficulty, score);
 };
 
+const startCountdown = () => {
+  let int = 3;
+  const countdown = document.getElementById('countdown');
+  countdown.innerHTML = '';
+  countdown.classList.remove('d-none');
+
+  const interval = setInterval(() => {
+    if (int === 0) {
+      clearInterval(interval);
+      countdown.classList.add('d-none');
+      countdown.innerHTML = '';
+    }
+    countdown.innerHTML = `<div class="countdown-container">${int}</div>`;
+    int--;
+  }, 1000);
+};
+
 const showMole = (dirts) => {
-  console.log(dirts);
+  const randomMole = Math.floor(Math.random() * dirts.length);
+  const randomSpeed = Math.random();
+  const randomTime = Math.floor(Math.random() * (3 + 1)) * 1000;
+
+  moles[randomMole].style.transition = `top ${randomSpeed}s`;
+  moles[randomMole].classList.add('mole-show-up');
+  setTimeout(() => {
+    moles[randomMole].classList.remove('mole-show-up');
+  }, randomTime);
 };
 
 // First time
@@ -42,4 +67,17 @@ if (!localStorage.getItem('difficulty')) {
   });
 }
 
-showMole(dirts);
+const startButton = document.getElementById('start');
+let isStarted = false;
+let score = 0;
+
+startButton.addEventListener('click', function () {
+  isStarted = true;
+  startButton.classList.add('d-none');
+  startCountdown();
+  setTimeout(() => {
+    isStarted = false;
+    startButton.classList.remove('d-none');
+  }, 15000);
+  showMole(dirts);
+});
