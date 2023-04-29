@@ -21,20 +21,23 @@ const setScore = (score) => {
 };
 
 const startCountdown = () => {
-  let int = 3;
-  const countdown = document.getElementById('countdown');
-  countdown.innerHTML = '';
-  countdown.classList.remove('d-none');
+  return new Promise((resolve) => {
+    let int = 3;
+    const countdown = document.getElementById('countdown');
+    countdown.innerHTML = '';
+    countdown.classList.remove('d-none');
 
-  const interval = setInterval(() => {
-    if (int === 0) {
-      clearInterval(interval);
-      countdown.classList.add('d-none');
-      countdown.innerHTML = '';
-    }
-    countdown.innerHTML = `<div class="countdown-container">${int}</div>`;
-    int--;
-  }, 1000);
+    const interval = setInterval(() => {
+      if (int === 0) {
+        clearInterval(interval);
+        countdown.classList.add('d-none');
+        countdown.innerHTML = '';
+        resolve();
+      }
+      countdown.innerHTML = `<div class="countdown-container">${int}</div>`;
+      int--;
+    }, 1000);
+  });
 };
 
 const showMole = (dirts) => {
@@ -71,10 +74,10 @@ const startButton = document.getElementById('start');
 let isStarted = false;
 let score = 0;
 
-startButton.addEventListener('click', function () {
+startButton.addEventListener('click', async function () {
   isStarted = true;
   startButton.classList.add('d-none');
-  startCountdown();
+  await startCountdown();
   setTimeout(() => {
     isStarted = false;
     startButton.classList.remove('d-none');
