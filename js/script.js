@@ -44,23 +44,32 @@ const startCountdown = () => {
   });
 };
 
-const getRandomDirt = (dirts) => {
-  [...dirts].filter((e) => !e.classList.contains('mole-show-up'));
+const getRandomDirt = (prevDirt) => {
   const randomNum = Math.floor(Math.random() * dirts.length);
+
+  if (dirts[randomNum].dataset.isPrevious) {
+    return getRandomDirt(prevDirt);
+  }
+  if (prevDirt) prevDirt.dataset.isPrevious = '';
+
   return dirts[randomNum];
 };
 
-const getRandomMoleSpeed = () => Math.random();
-
-const getRandomMoleAppearTime = (min, max) =>
+const getRandomTime = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-const showMole = () => {
-  const randomDirt = getRandomDirt(dirts);
-  const randomSpeed = getRandomMoleSpeed();
-  const randomTime = getRandomMoleAppearTime(100, 1000);
+const getRandomMoleSpeed = (min, max) => getRandomTime(min, max);
 
-  randomDirt.style.transition = `top ${randomSpeed}s`;
+const getRandomMoleAppearTime = (min, max) => getRandomTime(min, max);
+
+const showMole = () => {
+  const randomDirt = getRandomDirt(prevDirt);
+  const randomSpeed = getRandomMoleSpeed(0.5, 1);
+  const randomTime = getRandomMoleAppearTime(750, 1500);
+  prevDirt = randomDirt;
+
+  randomDirt.style.transition = `top ${randomSpeed}s ease-in`;
+  randomDirt.dataset.isPrevious = 'yes';
   randomDirt.classList.add('mole-show-up');
   console.log(randomDirt, randomSpeed, randomTime);
   setTimeout(() => {
@@ -91,15 +100,16 @@ if (!localStorage.getItem('difficulty')) {
 const startButton = document.getElementById('start');
 let isStarted = false;
 let score = 0;
+let prevDirt = null;
 
 startButton.addEventListener('click', async function () {
   isStarted = true;
   await setDelay(250);
   startButton.classList.add('d-none');
   await startCountdown();
-  showMole();
   setTimeout(() => {
     isStarted = false;
     startButton.classList.remove('d-none');
   }, 15000);
+  showMole();
 });

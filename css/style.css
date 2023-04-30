@@ -27,6 +27,7 @@ html {
 }
 
 body {
+  min-height: 100vh;
   font-family: cursive;
   color: #654321;
   line-height: 1;
@@ -47,7 +48,7 @@ img {
 
 .title {
   font-size: 4rem;
-  margin: 1rem auto;
+  padding: 1rem;
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
