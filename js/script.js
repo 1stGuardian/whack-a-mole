@@ -82,10 +82,10 @@ const getRandomMoleSpeed = () => {
 const getRandomMoleAppearTime = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-const showMole = () => {
+const showMole = async () => {
   const randomDirt = getRandomDirt(prevDirt);
   const randomSpeed = getRandomMoleSpeed();
-  const randomTime = getRandomMoleAppearTime(1000, 1500);
+  const randomTime = getRandomMoleAppearTime(300, 1000);
   prevDirt = randomDirt;
 
   randomDirt.firstElementChild.style.transition = `top ${randomSpeed}s ease-in`;
@@ -93,6 +93,7 @@ const showMole = () => {
   randomDirt.dataset.isPrevious = 'yes';
   randomDirt.classList.add('mole-show-up');
 
+  await setDelay(randomSpeed * 1000);
   setTimeout(() => {
     randomDirt.classList.remove('mole-show-up');
     randomDirt.firstElementChild.style.pointerEvents = 'auto';
