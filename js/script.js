@@ -148,6 +148,8 @@ startButton.addEventListener('click', async function () {
 for (const mole of moles) {
   mole.addEventListener('click', function () {
     if (isStarted) {
+      const sfx = document.getElementById('click-sfx');
+      sfx.play();
       score++;
       setScoreInfo(score);
 
