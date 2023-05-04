@@ -44,6 +44,11 @@ img {
   display: flex;
   flex-wrap: wrap;
   margin: 2.5rem auto;
+  cursor: url('../img/hammer.png') 0 50, auto;
+}
+
+.container:active {
+  cursor: url('../img/hammer-rotate.png') 30 50, auto;
 }
 
 .title {
