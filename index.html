@@ -8,6 +8,10 @@
     <title>Whack A Mole</title>
 
     <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="popup d-none" id="popup">
@@ -44,15 +48,18 @@
 
     <div id="information">
       <ul>
-        <li>Difficulty : <span id="difficulty"></span></li>
         <li>High Score : <span id="high-score"></span></li>
         <li>Score : <span id="score"></span></li>
       </ul>
     </div>
 
-    <div id="start" role="button" tabindex="1">
-      <p class="text-center">START</p>
-    </div>
+    <button type="button" class="btn-primary" id="start">
+      <i class="fas fa-fw fa-play"></i>
+    </button>
+
+    <button type="button" class="btn-primary" id="settings">
+      <i class="fas fa-fw fa-gear"></i>
+    </button>
 
     <div class="countdown d-none" id="countdown">
       <div class="countdown-container"></div>
@@ -78,6 +85,29 @@
       </div>
       <div class="dirt">
         <div class="mole"></div>
+      </div>
+    </div>
+
+    <div class="options d-none" id="options">
+      <div class="options-container">
+        <h2>Options</h2>
+        <div class="input-group">
+          <label for="bgm-volume">BGM Volume</label>
+          <input type="range" id="bgm-volume" min="0" max="100" value="100" />
+        </div>
+        <div class="input-group">
+          <label for="sfx-volume">SFX Volume</label>
+          <input type="range" id="sfx-volume" min="0" max="100" value="100" />
+        </div>
+        <div class="input-group">
+          <label for="difficulty">Difficulty</label>
+          <select id="difficulty">
+            <option value="easy" selected>Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <button id="save-button" type="button" tabindex="1">Save</button>
       </div>
     </div>
 

@@ -4,10 +4,29 @@ if (!localStorage) {
   );
 }
 
+const bgm = new Audio('audio/bgm.mp3');
 const popup = document.getElementById('popup');
+const settingsButton = document.getElementById('settings');
+const options = document.getElementById('options');
+const bgmVolume = document.getElementById('bgm-volume');
+const saveButton = document.getElementById('save-button');
+const difficultyInfo = document.getElementById('difficulty');
 const dirts = document.querySelectorAll('.dirt');
 const moles = document.querySelectorAll('.mole');
 let difficulty = localStorage.getItem('difficulty');
+
+settingsButton.addEventListener('click', function () {
+  options.classList.remove('d-none');
+});
+
+saveButton.addEventListener('click', function () {
+  options.classList.add('d-none');
+});
+
+bgmVolume.addEventListener('input', function () {
+  bgmVolume.setAttribute('title', bgmVolume.value);
+  bgm.volume = bgmVolume.value / 100;
+});
 
 const setDifficulty = (diff) => {
   difficulty = diff;
@@ -16,8 +35,12 @@ const setDifficulty = (diff) => {
 };
 
 const setDifficultyInfo = () => {
-  const difficultyInfo = document.getElementById('difficulty');
-  difficultyInfo.textContent = difficulty ?? 'easy';
+  for (const child of difficultyInfo.children) {
+    if (child.value === difficulty) {
+      return child.setAttribute('selected', '');
+    }
+    child.removeAttribute('selected');
+  }
 };
 
 const setScore = (score) => {
@@ -102,6 +125,8 @@ const showMole = async () => {
 };
 
 // First load
+bgm.loop = true;
+bgm.play();
 setDifficultyInfo();
 setHighScoreInfo();
 setScoreInfo(0);
@@ -109,7 +134,9 @@ setScoreInfo(0);
 // If difficulty not set (first time access)
 if (!difficulty) {
   const difficulties = document.querySelector('.difficulties');
+  const startButton = document.getElementById('start');
   popup.classList.remove('d-none');
+  startButton.setAttribute('tabindex', '-1');
 
   difficulties.addEventListener('click', async function (e) {
     if (e.target.tagName === 'H3') {
@@ -121,9 +148,14 @@ if (!difficulty) {
       localStorage.setItem('hard', 0);
 
       popup.classList.add('d-none');
+      startButton.setAttribute('tabindex', '1');
     }
   });
 }
+
+difficultyInfo.addEventListener('change', function () {
+  setDifficulty(difficultyInfo.value);
+});
 
 const startButton = document.getElementById('start');
 let isStarted = false;
