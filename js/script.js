@@ -5,11 +5,13 @@ if (!localStorage) {
 }
 
 const bgm = new Audio('audio/bgm.mp3');
+const whackSfx = new Audio('audio/pop.mp3');
 const maskBgm = new Audio('audio/mask.mp3');
 const popup = document.getElementById('popup');
 const settingsButton = document.getElementById('settings');
 const options = document.getElementById('options');
 const bgmVolume = document.getElementById('bgm-volume');
+const sfxVolume = document.getElementById('sfx-volume');
 const saveButton = document.getElementById('save-button');
 const difficultyInfo = document.getElementById('difficulty');
 const extraMole = document.getElementById('extra-mole');
@@ -28,6 +30,12 @@ saveButton.addEventListener('click', function () {
 bgmVolume.addEventListener('input', function () {
   bgmVolume.setAttribute('title', bgmVolume.value);
   bgm.volume = bgmVolume.value / 100;
+});
+
+sfxVolume.addEventListener('change', function () {
+  sfxVolume.setAttribute('title', sfxVolume.value);
+  whackSfx.volume = sfxVolume.value / 100;
+  whackSfx.play();
 });
 
 const setDifficulty = (diff) => {
@@ -117,19 +125,22 @@ const showMole = async (isExtra) => {
   randomDirt.firstElementChild.style.transition = `top ${randomSpeed}s ease-in`;
   randomDirt.lastElementChild.style.transition = `top ${randomSpeed}s ease-in`;
   randomDirt.firstElementChild.style.pointerEvents = 'auto';
+  randomDirt.lastElementChild.style.pointerEvents = 'auto';
   randomDirt.dataset.isPrevious = 'yes';
   randomDirt.classList.add('mole-show-up');
 
-  await setDelay(randomSpeed * 1000);
-  if (chance > 75) {
-    randomDirt.lastElementChild.style.zIndex = '667';
-  }
   setTimeout(() => {
-    randomDirt.classList.remove('mole-show-up');
-    randomDirt.firstElementChild.style.pointerEvents = 'auto';
-    randomDirt.lastElementChild.style.zIndex = '666';
-    if (isStarted && !isExtra) showMole();
-  }, randomTime);
+    if (chance > 75) {
+      randomDirt.lastElementChild.style.zIndex = '667';
+    }
+
+    setTimeout(() => {
+      randomDirt.classList.remove('mole-show-up');
+      randomDirt.firstElementChild.style.pointerEvents = 'auto';
+      randomDirt.lastElementChild.style.zIndex = '666';
+      if (isStarted && !isExtra) showMole();
+    }, randomTime);
+  }, randomSpeed * 1000);
 };
 
 // First load
@@ -148,15 +159,16 @@ if (!difficulty) {
 
   difficulties.addEventListener('click', async function (e) {
     if (e.target.tagName === 'H3') {
-      await setDelay(250);
-      setDifficulty(e.target.parentElement.dataset.difficulty);
+      setTimeout(() => {
+        setDifficulty(e.target.parentElement.dataset.difficulty);
 
-      localStorage.setItem('easy', 0);
-      localStorage.setItem('medium', 0);
-      localStorage.setItem('hard', 0);
+        localStorage.setItem('easy', 0);
+        localStorage.setItem('medium', 0);
+        localStorage.setItem('hard', 0);
 
-      popup.classList.add('d-none');
-      startButton.setAttribute('tabindex', '1');
+        popup.classList.add('d-none');
+        startButton.setAttribute('tabindex', '1');
+      }, 250);
     }
   });
 }
@@ -174,22 +186,22 @@ startButton.addEventListener('click', async function () {
   isStarted = true;
   score = 0;
   setScoreInfo(score);
-  await setDelay(250);
-  startButton.classList.add('d-none');
-  await startCountdown();
-  setTimeout(() => {
-    isStarted = false;
-    setScore(score);
-    startButton.classList.remove('d-none');
-  }, 30000);
-  showMole();
+  setTimeout(async () => {
+    startButton.classList.add('d-none');
+    await startCountdown();
+    setTimeout(() => {
+      isStarted = false;
+      setScore(score);
+      startButton.classList.remove('d-none');
+    }, 30000);
+    showMole();
+  }, 250);
 });
 
 for (const mole of moles) {
   mole.addEventListener('click', function () {
     if (isStarted) {
-      const sfx = document.getElementById('click-sfx');
-      sfx.play();
+      whackSfx.play();
 
       if (this.classList.contains('second-mole')) {
         extraMole.classList.add('mole-show-up');
@@ -200,11 +212,10 @@ for (const mole of moles) {
           extraMole.classList.remove('mole-show-up');
           maskBgm.pause();
         }, 5000);
-      } else {
-        score++;
-        setScoreInfo(score);
-        this.style.pointerEvents = 'none';
       }
+      score++;
+      setScoreInfo(score);
+      this.style.pointerEvents = 'none';
 
       this.parentElement.firstElementChild.style.transition = `top 0.1s ease-out`;
       this.parentElement.lastElementChild.style.transition = `top 0.1s ease-out`;
@@ -215,7 +226,8 @@ for (const mole of moles) {
 
 document.addEventListener('mousemove', async function (e) {
   if (extraMole.classList.contains('mole-show-up')) {
-    await setDelay(500);
+    // setTimeout(() => {
     extraMole.style.left = `${e.clientX - 200}px`;
+    // }, 500);
   }
 });
