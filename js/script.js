@@ -13,10 +13,12 @@ const options = document.getElementById('options');
 const bgmVolume = document.getElementById('bgm-volume');
 const sfxVolume = document.getElementById('sfx-volume');
 const saveButton = document.getElementById('save-button');
+const startButton = document.getElementById('start');
 const difficultyInfo = document.getElementById('difficulty');
 const extraMole = document.getElementById('extra-mole');
 const dirts = document.querySelectorAll('.dirt');
 const moles = document.querySelectorAll('.mole');
+const playTime = 1000 * 60;
 let difficulty = localStorage.getItem('difficulty');
 
 settingsButton.addEventListener('click', function () {
@@ -71,10 +73,6 @@ const setHighScoreInfo = () => {
   highScoreInfo.textContent = highScore;
 };
 
-const setDelay = (delay) => {
-  return new Promise((resolve) => setTimeout(() => resolve(), delay));
-};
-
 const startCountdown = () => {
   return new Promise((resolve) => {
     let int = 3;
@@ -107,20 +105,38 @@ const getRandomDirt = (prevDirt) => {
   return dirts[randomNum];
 };
 
-const getRandomMoleSpeed = () => {
-  const speed = Math.random();
-  return speed > 0.1 ? speed : getRandomMoleSpeed();
+const getRandomInt = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-const getRandomMoleAppearTime = (min, max) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+const getRandomMoleSpeed = () => {
+  return getRandomInt(1, 10) / 10;
+};
 
-const showMole = async (isExtra) => {
+const getRandomMoleAppearTime = () => {
+  let min, max;
+
+  if (difficulty === 'easy') {
+    min = 1000;
+    max = 1500;
+  } else if (difficulty === 'medium') {
+    min = 750;
+    max = 1000;
+  } else if (difficulty === 'hard') {
+    min = 500;
+    max = 750;
+  }
+
+  return getRandomInt(min, max);
+};
+
+const showMole = (isExtra) => {
   const randomDirt = getRandomDirt(prevDirt);
   const randomSpeed = getRandomMoleSpeed();
-  const randomTime = getRandomMoleAppearTime(500, 1000);
-  const chance = Math.floor(Math.random() * 100 + 1);
+  const randomAppearTime = getRandomMoleAppearTime();
+  const chance = getRandomInt(0, 100);
   prevDirt = randomDirt;
+  console.log(randomDirt, randomSpeed, randomAppearTime, chance);
 
   randomDirt.firstElementChild.style.transition = `top ${randomSpeed}s ease-in`;
   randomDirt.lastElementChild.style.transition = `top ${randomSpeed}s ease-in`;
@@ -130,16 +146,21 @@ const showMole = async (isExtra) => {
   randomDirt.classList.add('mole-show-up');
 
   setTimeout(() => {
-    if (chance > 75) {
-      randomDirt.lastElementChild.style.zIndex = '667';
+    if (difficulty === 'medium') {
+      if (chance > 75) {
+        randomDirt.lastElementChild.style.zIndex = '667';
+      }
+    } else if (difficulty === 'hard') {
+      if (chance > 50) {
+        randomDirt.lastElementChild.style.zIndex = '667';
+      }
     }
 
     setTimeout(() => {
       randomDirt.classList.remove('mole-show-up');
-      randomDirt.firstElementChild.style.pointerEvents = 'auto';
       randomDirt.lastElementChild.style.zIndex = '666';
       if (isStarted && !isExtra) showMole();
-    }, randomTime);
+    }, randomAppearTime);
   }, randomSpeed * 1000);
 };
 
@@ -153,14 +174,14 @@ setScoreInfo(0);
 // If difficulty not set (first time access)
 if (!difficulty) {
   const difficulties = document.querySelector('.difficulties');
-  const startButton = document.getElementById('start');
   popup.classList.remove('d-none');
   startButton.setAttribute('tabindex', '-1');
 
   difficulties.addEventListener('click', async function (e) {
-    if (e.target.tagName === 'H3') {
+    console.log(e);
+    if (e.target.classList.contains('difficulty')) {
       setTimeout(() => {
-        setDifficulty(e.target.parentElement.dataset.difficulty);
+        setDifficulty(e.target.dataset.difficulty);
 
         localStorage.setItem('easy', 0);
         localStorage.setItem('medium', 0);
@@ -177,7 +198,6 @@ difficultyInfo.addEventListener('change', function () {
   setDifficulty(difficultyInfo.value);
 });
 
-const startButton = document.getElementById('start');
 let isStarted = false;
 let score = 0;
 let prevDirt = null;
@@ -193,7 +213,7 @@ startButton.addEventListener('click', async function () {
       isStarted = false;
       setScore(score);
       startButton.classList.remove('d-none');
-    }, 30000);
+    }, playTime);
     showMole();
   }, 250);
 });
@@ -204,12 +224,14 @@ for (const mole of moles) {
       whackSfx.play();
 
       if (this.classList.contains('second-mole')) {
+        extraMole.classList.remove('mole-hidden');
         extraMole.classList.add('mole-show-up');
         this.style.zIndex = '666';
         maskBgm.loop = true;
         maskBgm.play();
         setTimeout(() => {
           extraMole.classList.remove('mole-show-up');
+          extraMole.classList.add('mole-hidden');
           maskBgm.pause();
         }, 5000);
       }
