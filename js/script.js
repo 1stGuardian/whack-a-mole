@@ -127,7 +127,7 @@ const getRandomMoleAppearTime = () => {
   return getRandomInt(min, max);
 };
 
-const showMole = (isExtra) => {
+const showMole = () => {
   const randomDirt = getRandomDirt();
   const randomSpeed = getRandomMoleSpeed();
   const randomAppearTime = getRandomMoleAppearTime();
@@ -157,7 +157,7 @@ const showMole = (isExtra) => {
       }, randomSpeed * 1000);
 
       randomDirt.classList.remove('mole-show-up');
-      if (isStarted && !isExtra) showMole();
+      if (isStarted) showMole();
     }, randomAppearTime);
   }, randomSpeed * 1000);
 };
@@ -175,7 +175,8 @@ const handleMoleClick = (e) => {
   score++;
   setScoreInfo(score);
 
-  mole.style.pointerEvents = 'none';
+  mole.parentElement.firstElementChild.style.pointerEvents = 'none';
+  mole.parentElement.lastElementChild.style.pointerEvents = 'none';
   setClickedMoleTransition(mole.parentElement);
   mole.parentElement.classList.remove('mole-show-up');
 };
@@ -251,8 +252,7 @@ const endGame = () => {
 // Main config
 
 const playTime = 1000 * 60; // 1s (1000 ms) * 60s = 1 minute
-const moleAppearTime = {
-  // Mole appear time (doesn't include transition's time)
+const moleAppearTime = { // Mole appear time (doesn't include transition's time)
   easy: {
     min: 750,
     max: 1250,
