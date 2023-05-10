@@ -7,38 +7,54 @@ if (!localStorage) {
 const bgm = new Audio('audio/bgm.mp3');
 const whackSfx = new Audio('audio/pop.mp3');
 const maskBgm = new Audio('audio/mask.mp3');
-const popup = document.getElementById('popup');
+
+const startButton = document.getElementById('start');
 const settingsButton = document.getElementById('settings');
 const options = document.getElementById('options');
 const bgmVolume = document.getElementById('bgm-volume');
 const sfxVolume = document.getElementById('sfx-volume');
-const saveButton = document.getElementById('save-button');
-const startButton = document.getElementById('start');
 const difficultyInfo = document.getElementById('difficulty');
+const saveButton = document.getElementById('save-button');
 const extraMole = document.getElementById('extra-mole');
-const dirts = document.querySelectorAll('.dirt');
-const moles = document.querySelectorAll('.mole');
-const playTime = 1000 * 60;
-let difficulty = localStorage.getItem('difficulty');
 
-settingsButton.addEventListener('click', function () {
-  options.classList.remove('d-none');
-});
+const init = () => {
+  playBgm();
+  setDifficultyInfo();
+  setHighScoreInfo();
+  setScoreInfo(0);
+  if (!difficulty) showPopup();
+};
 
-saveButton.addEventListener('click', function () {
-  options.classList.add('d-none');
-});
+const playBgm = () => {
+  bgm.loop = true;
+  bgm.play();
+};
 
-bgmVolume.addEventListener('input', function () {
-  bgmVolume.setAttribute('title', bgmVolume.value);
-  bgm.volume = bgmVolume.value / 100;
-});
+const showPopup = () => {
+  const popup = document.getElementById('popup');
+  const difficulties = document.querySelector('.difficulties');
 
-sfxVolume.addEventListener('change', function () {
-  sfxVolume.setAttribute('title', sfxVolume.value);
-  whackSfx.volume = sfxVolume.value / 100;
-  whackSfx.play();
-});
+  const addDifficultyClickHandler = (e) => {
+    if (e.target.classList.contains('difficulty')) {
+      setTimeout(() => { // Just delay
+        setDifficulty(e.target.dataset.difficulty);
+
+        localStorage.setItem('easy', 0);
+        localStorage.setItem('medium', 0);
+        localStorage.setItem('hard', 0);
+
+        popup.classList.add('d-none');
+        startButton.setAttribute('tabindex', '1');
+
+        difficulties.removeEventListener('click', addDifficultyClickHandler);
+      }, 250);
+    }
+  };
+
+  popup.classList.remove('d-none');
+  startButton.setAttribute('tabindex', '-1');
+  difficulties.addEventListener('click', addDifficultyClickHandler);
+};
 
 const setDifficulty = (diff) => {
   difficulty = diff;
@@ -48,10 +64,9 @@ const setDifficulty = (diff) => {
 
 const setDifficultyInfo = () => {
   for (const child of difficultyInfo.children) {
-    if (child.value === difficulty) {
-      return child.setAttribute('selected', '');
-    }
-    child.removeAttribute('selected');
+    child.value === difficulty
+      ? child.setAttribute('selected', '')
+      : child.removeAttribute('selected');
   }
 };
 
@@ -63,8 +78,7 @@ const setScore = (score) => {
 };
 
 const setScoreInfo = (score) => {
-  const scoreInfo = document.getElementById('score');
-  scoreInfo.textContent = score;
+  document.getElementById('score').textContent = score;
 };
 
 const setHighScoreInfo = () => {
@@ -73,36 +87,31 @@ const setHighScoreInfo = () => {
   highScoreInfo.textContent = highScore;
 };
 
-const startCountdown = () => {
-  return new Promise((resolve) => {
-    let int = 3;
-    const countdown = document.getElementById('countdown');
-    countdown.innerHTML = '';
-    countdown.classList.remove('d-none');
+const startCountdown = async () => {
+  const countdown = document.getElementById('countdown');
+  countdown.classList.remove('d-none');
 
-    const interval = setInterval(() => {
-      if (int === 0) {
-        clearInterval(interval);
-        countdown.classList.add('d-none');
-        countdown.innerHTML = '';
-        resolve();
-      }
-      countdown.innerHTML = `<div class="countdown-container">${int}</div>`;
-      int--;
-    }, 1000);
-  });
-};
-
-const getRandomDirt = (prevDirt) => {
-  const randomNum = Math.floor(Math.random() * dirts.length);
-
-  if (dirts[randomNum].dataset.isPrevious) {
-    return getRandomDirt(prevDirt);
+  for (let i = 3; i >= 1; i--) {
+    countdown.innerHTML = `<div class="countdown-container">${i}</div>`;
+    whackSfx.play();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
-  if (prevDirt) prevDirt.dataset.isPrevious = '';
+  countdown.classList.add('d-none');
+  countdown.innerHTML = '';
+};
 
-  return dirts[randomNum];
+const getRandomDirt = () => {
+  const dirts = [...document.querySelectorAll('.dirt')];
+  const availableDirts = dirts.filter((dirt) => !dirt.dataset.isPrevious);
+  const randomNum = Math.floor(Math.random() * availableDirts.length);
+  const randomDirt = availableDirts[randomNum];
+
+  if (prevDirt) prevDirt.dataset.isPrevious = '';
+  prevDirt = randomDirt;
+  prevDirt.dataset.isPrevious = true;
+
+  return randomDirt;
 };
 
 const getRandomInt = (min, max) => {
@@ -114,142 +123,181 @@ const getRandomMoleSpeed = () => {
 };
 
 const getRandomMoleAppearTime = () => {
-  let min, max;
-
-  if (difficulty === 'easy') {
-    min = 1000;
-    max = 1500;
-  } else if (difficulty === 'medium') {
-    min = 750;
-    max = 1000;
-  } else if (difficulty === 'hard') {
-    min = 500;
-    max = 750;
-  }
-
+  const { min, max } = moleAppearTime[difficulty];
   return getRandomInt(min, max);
 };
 
 const showMole = (isExtra) => {
-  const randomDirt = getRandomDirt(prevDirt);
+  const randomDirt = getRandomDirt();
   const randomSpeed = getRandomMoleSpeed();
   const randomAppearTime = getRandomMoleAppearTime();
-  const chance = getRandomInt(0, 100);
-  prevDirt = randomDirt;
-  console.log(randomDirt, randomSpeed, randomAppearTime, chance);
+  const extraMoleChance = getRandomInt(0, 100);
+  const zIndex =
+    (difficulty === 'medium' && extraMoleChance > 75) ||
+    (difficulty === 'hard' && extraMoleChance > 50)
+      ? 667
+      : 666;
 
-  randomDirt.firstElementChild.style.transition = `top ${randomSpeed}s ease-in`;
-  randomDirt.lastElementChild.style.transition = `top ${randomSpeed}s ease-in`;
-  randomDirt.firstElementChild.style.pointerEvents = 'auto';
-  randomDirt.lastElementChild.style.pointerEvents = 'auto';
-  randomDirt.dataset.isPrevious = 'yes';
+  setMoleTransition(randomDirt, randomSpeed);
   randomDirt.classList.add('mole-show-up');
 
-  setTimeout(() => {
-    if (difficulty === 'medium') {
-      if (chance > 75) {
-        randomDirt.lastElementChild.style.zIndex = '667';
-      }
-    } else if (difficulty === 'hard') {
-      if (chance > 50) {
-        randomDirt.lastElementChild.style.zIndex = '667';
-      }
+  // Mole show up duration calculated when the mole transition is complete, then i should add delay
+  // Wait until transition end
+  setTimeout(() => { // then
+    // Change to second-mole if condition are met
+    if (!extraMole.classList.contains('mole-show-up')) {
+      randomDirt.lastElementChild.style.zIndex = zIndex;
     }
 
-    setTimeout(() => {
+    // Wait until moleAppearTime finished
+    setTimeout(() => { // then
+      // Don't change to first-mole until first-mole's transition end
+      setTimeout(() => {
+        randomDirt.lastElementChild.style.zIndex = '666';
+      }, randomSpeed * 1000);
+
       randomDirt.classList.remove('mole-show-up');
-      randomDirt.lastElementChild.style.zIndex = '666';
       if (isStarted && !isExtra) showMole();
     }, randomAppearTime);
   }, randomSpeed * 1000);
 };
 
-// First load
-bgm.loop = true;
-bgm.play();
-setDifficultyInfo();
-setHighScoreInfo();
-setScoreInfo(0);
+const handleMoleClick = (e) => {
+  if (!isStarted) return;
 
-// If difficulty not set (first time access)
-if (!difficulty) {
-  const difficulties = document.querySelector('.difficulties');
-  popup.classList.remove('d-none');
-  startButton.setAttribute('tabindex', '-1');
+  const mole = e.target;
+  whackSfx.play();
 
-  difficulties.addEventListener('click', async function (e) {
-    console.log(e);
-    if (e.target.classList.contains('difficulty')) {
-      setTimeout(() => {
-        setDifficulty(e.target.dataset.difficulty);
+  if (mole.classList.contains('second-mole')) {
+    showExtraMole(e);
+  }
 
-        localStorage.setItem('easy', 0);
-        localStorage.setItem('medium', 0);
-        localStorage.setItem('hard', 0);
-
-        popup.classList.add('d-none');
-        startButton.setAttribute('tabindex', '1');
-      }, 250);
-    }
-  });
-}
-
-difficultyInfo.addEventListener('change', function () {
-  setDifficulty(difficultyInfo.value);
-});
-
-let isStarted = false;
-let score = 0;
-let prevDirt = null;
-
-startButton.addEventListener('click', async function () {
-  isStarted = true;
-  score = 0;
+  score++;
   setScoreInfo(score);
-  setTimeout(async () => {
-    startButton.classList.add('d-none');
-    await startCountdown();
-    setTimeout(() => {
-      isStarted = false;
-      setScore(score);
-      startButton.classList.remove('d-none');
-    }, playTime);
-    showMole();
-  }, 250);
-});
 
-for (const mole of moles) {
-  mole.addEventListener('click', function () {
-    if (isStarted) {
-      whackSfx.play();
+  mole.style.pointerEvents = 'none';
+  setClickedMoleTransition(mole.parentElement);
+  mole.parentElement.classList.remove('mole-show-up');
+};
 
-      if (this.classList.contains('second-mole')) {
-        extraMole.classList.remove('mole-hidden');
-        extraMole.classList.add('mole-show-up');
-        this.style.zIndex = '666';
-        maskBgm.loop = true;
-        maskBgm.play();
-        setTimeout(() => {
-          extraMole.classList.remove('mole-show-up');
-          extraMole.classList.add('mole-hidden');
-          maskBgm.pause();
-        }, 5000);
-      }
-      score++;
-      setScoreInfo(score);
-      this.style.pointerEvents = 'none';
+const showExtraMole = (e) => {
+  document.addEventListener('mousemove', handleExtraMoleMovement);
+  extraMole.classList.remove('mole-hidden');
+  extraMole.classList.add('mole-show-up');
+  e.target.style.zIndex = '666';
+  maskBgm.loop = true;
+  maskBgm.play();
+  setTimeout(hideExtraMole, 5000);
+};
 
-      this.parentElement.firstElementChild.style.transition = `top 0.1s ease-out`;
-      this.parentElement.lastElementChild.style.transition = `top 0.1s ease-out`;
-      this.parentElement.classList.remove('mole-show-up');
-    }
-  });
-}
+const hideExtraMole = () => {
+  extraMole.classList.remove('mole-show-up');
+  extraMole.classList.add('mole-hidden');
+  maskBgm.pause();
+};
 
-document.addEventListener('mousemove', async function (e) {
+const handleExtraMoleMovement = (e) => {
   if (extraMole.classList.contains('mole-show-up')) {
     // setTimeout(() => {
     extraMole.style.left = `${e.clientX - 200}px`;
     // }, 500);
   }
+};
+
+const setMoleTransition = (dirt, duration) => {
+  dirt.firstElementChild.style.transition = `top ${duration}s ease-in`;
+  dirt.lastElementChild.style.transition = `top ${duration}s ease-in`;
+  dirt.firstElementChild.style.pointerEvents = 'auto';
+  dirt.lastElementChild.style.pointerEvents = 'auto';
+};
+
+const setClickedMoleTransition = (dirt) => {
+  dirt.firstElementChild.style.transition = `top 0.1s ease-out`;
+  dirt.lastElementChild.style.transition = `top 0.1s ease-out`;
+};
+
+const setMoleClickListener = () => {
+  const moles = [...document.querySelectorAll('.mole')];
+  for (const mole of moles) {
+    mole.addEventListener('click', handleMoleClick);
+  }
+};
+
+const startGame = () => {
+  isStarted = true;
+  score = 0;
+  setScoreInfo(score);
+  setTimeout(async () => { // Just delay
+    startButton.classList.add('d-none');
+    settingsButton.classList.add('d-none');
+    await startCountdown();
+
+    setTimeout(() => {
+      endGame();
+    }, playTime);
+
+    setMoleClickListener();
+    showMole();
+  }, 250);
+};
+
+const endGame = () => {
+  isStarted = false;
+  setScore(score);
+  startButton.classList.remove('d-none');
+  settingsButton.classList.remove('d-none');
+};
+
+// Main config
+
+const playTime = 1000 * 60; // 1s (1000 ms) * 60s = 1 minute
+const moleAppearTime = {
+  // Mole appear time (doesn't include transition's time)
+  easy: {
+    min: 750,
+    max: 1250,
+  },
+  medium: {
+    min: 500,
+    max: 750,
+  },
+  hard: {
+    min: 250,
+    max: 500,
+  },
+};
+
+// Main program
+
+let difficulty = localStorage.getItem('difficulty');
+let isStarted = false;
+let score = 0;
+let prevDirt = null;
+
+init();
+
+settingsButton.addEventListener('click', () => {
+  options.classList.remove('d-none');
 });
+
+bgmVolume.addEventListener('input', () => {
+  bgmVolume.setAttribute('title', bgmVolume.value);
+  bgm.volume = bgmVolume.value / 100;
+});
+
+sfxVolume.addEventListener('change', () => {
+  sfxVolume.setAttribute('title', sfxVolume.value);
+  whackSfx.volume = sfxVolume.value / 100;
+  whackSfx.play();
+});
+
+difficultyInfo.addEventListener('change', () => {
+  setDifficulty(difficultyInfo.value);
+  setHighScoreInfo();
+});
+
+saveButton.addEventListener('click', () => {
+  options.classList.add('d-none');
+});
+
+startButton.addEventListener('click', startGame);
