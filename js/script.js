@@ -36,7 +36,8 @@ const showPopup = () => {
 
   const addDifficultyClickHandler = (e) => {
     if (e.target.classList.contains('difficulty')) {
-      setTimeout(() => { // Just delay
+      setTimeout(() => {
+        // Just delay
         setDifficulty(e.target.dataset.difficulty);
 
         localStorage.setItem('easy', 0);
@@ -143,14 +144,16 @@ const showMole = () => {
 
   // Mole show up duration calculated when the mole transition is complete, then i should add delay
   // Wait until transition end
-  setTimeout(() => { // then
+  setTimeout(() => {
+    // then
     // Change to second-mole if condition are met
     if (!extraMole.classList.contains('mole-show-up')) {
       randomDirt.lastElementChild.style.zIndex = zIndex;
     }
 
     // Wait until moleAppearTime finished
-    setTimeout(() => { // then
+    setTimeout(() => {
+      // then
       // Don't change to first-mole until first-mole's transition end
       setTimeout(() => {
         randomDirt.lastElementChild.style.zIndex = '666';
@@ -200,7 +203,12 @@ const hideExtraMole = () => {
 const handleExtraMoleMovement = (e) => {
   if (extraMole.classList.contains('mole-show-up')) {
     // setTimeout(() => {
-    extraMole.style.left = `${e.clientX - 200}px`;
+    if (innerWidth < 576) {
+      extraMole.style.left = `${e.clientX - 50}px`;
+      extraMole.style.bottom = `${0 - e.clientY + 555}px`;
+    } else {
+      extraMole.style.left = `${e.clientX - 200}px`;
+    }
     // }, 500);
   }
 };
@@ -228,7 +236,8 @@ const startGame = () => {
   isStarted = true;
   score = 0;
   setScoreInfo(score);
-  setTimeout(async () => { // Just delay
+  setTimeout(async () => {
+    // Just delay
     startButton.classList.add('d-none');
     settingsButton.classList.add('d-none');
     await startCountdown();
@@ -252,7 +261,8 @@ const endGame = () => {
 // Main config
 
 const playTime = 1000 * 60; // 1s (1000 ms) * 60s = 1 minute
-const moleAppearTime = { // Mole appear time (doesn't include transition's time)
+const moleAppearTime = {
+  // Mole appear time (doesn't include transition's time)
   easy: {
     min: 750,
     max: 1250,
