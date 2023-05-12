@@ -46,54 +46,60 @@
       </div>
     </div>
 
-    <div id="information">
-      <ul>
-        <li>High Score : <span id="high-score"></span></li>
-        <li>Score : <span id="score"></span></li>
-      </ul>
+    <div id="game-info">
+      <div id="information">
+        <ul>
+          <li>High Score : <span id="high-score"></span></li>
+          <li>Score : <span id="score"></span></li>
+        </ul>
+      </div>
+
+      <div id="button">
+        <button type="button" class="btn-primary" id="start">
+          <i class="fas fa-fw fa-play"></i>
+        </button>
+
+        <button type="button" class="btn-primary" id="settings">
+          <i class="fas fa-fw fa-gear"></i>
+        </button>
+      </div>
     </div>
-
-    <button type="button" class="btn-primary" id="start">
-      <i class="fas fa-fw fa-play"></i>
-    </button>
-
-    <button type="button" class="btn-primary" id="settings">
-      <i class="fas fa-fw fa-gear"></i>
-    </button>
 
     <div class="countdown d-none" id="countdown">
       <div class="countdown-container"></div>
     </div>
 
-    <h1 class="title text-center">Whack A Mole</h1>
+    <main>
+      <h1 class="title text-center">Whack A Mole</h1>
 
-    <div class="container">
-      <div class="dirt">
-        <div class="mole first-mole"></div>
-        <div class="mole second-mole"></div>
+      <div class="container">
+        <div class="dirt">
+          <div class="mole first-mole"></div>
+          <div class="mole second-mole"></div>
+        </div>
+        <div class="dirt">
+          <div class="mole first-mole"></div>
+          <div class="mole second-mole"></div>
+        </div>
+        <div class="dirt">
+          <div class="mole first-mole"></div>
+          <div class="mole second-mole"></div>
+        </div>
+        <div class="dirt">
+          <div class="mole first-mole"></div>
+          <div class="mole second-mole"></div>
+        </div>
+        <div class="dirt">
+          <div class="mole first-mole"></div>
+          <div class="mole second-mole"></div>
+        </div>
+        <div class="dirt">
+          <div class="mole first-mole"></div>
+          <div class="mole second-mole"></div>
+        </div>
+        <div class="mole-hidden" id="extra-mole"></div>
       </div>
-      <div class="dirt">
-        <div class="mole first-mole"></div>
-        <div class="mole second-mole"></div>
-      </div>
-      <div class="dirt">
-        <div class="mole first-mole"></div>
-        <div class="mole second-mole"></div>
-      </div>
-      <div class="dirt">
-        <div class="mole first-mole"></div>
-        <div class="mole second-mole"></div>
-      </div>
-      <div class="dirt">
-        <div class="mole first-mole"></div>
-        <div class="mole second-mole"></div>
-      </div>
-      <div class="dirt">
-        <div class="mole first-mole"></div>
-        <div class="mole second-mole"></div>
-      </div>
-      <div class="mole-hidden" id="extra-mole"></div>
-    </div>
+    </main>
 
     <div class="options d-none" id="options">
       <div class="options-container">

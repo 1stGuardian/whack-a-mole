@@ -22,16 +22,22 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 14px;
   scroll-behavior: smooth;
 }
 
 body {
-  min-height: 100vh;
   font-family: cursive;
   color: #654321;
-  line-height: 1;
   background-image: linear-gradient(45deg, #fd7e14 5%, #ffd43b 95%);
+}
+
+main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem 0;
 }
 
 button,
@@ -65,11 +71,20 @@ select {
 
 button.btn-primary {
   font-size: 2rem;
+  z-index: 669;
 }
 
 img {
   display: block;
   max-width: 100%;
+}
+
+label {
+  font-size: 1.25rem;
+}
+
+input[type='range'] {
+  width: 50%;
 }
 
 .input-group {
@@ -82,7 +97,7 @@ img {
   max-width: 992px;
   display: flex;
   flex-wrap: wrap;
-  margin: 2.5rem auto;
+  margin: 0 auto;
   cursor: url('../img/hammer.png') 0 50, auto;
 }
 
@@ -91,8 +106,7 @@ img {
 }
 
 .title {
-  font-size: 4rem;
-  padding: 1rem;
+  font-size: 3rem;
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
@@ -140,20 +154,20 @@ img {
 }
 
 .popup-container {
-  width: 48rem;
-  height: 27rem;
+  width: 95%;
+  height: 60%;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
 }
 
 .options-container {
-  width: 30rem;
-  padding: 2rem 2.5rem;
+  width: 95%;
+  padding: 2rem;
 }
 
 .difficulties {
-  padding: 1rem 5rem;
+  padding: 1rem 4rem;
 }
 
 .difficulty {
@@ -229,8 +243,9 @@ img {
 
 #information {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: 7rem;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 1.5rem;
   line-height: 1.25;
   font-family: 'Courier New', Courier, monospace;
@@ -239,13 +254,15 @@ img {
 
 ul > li {
   list-style: none;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .dirt {
   width: 16rem;
-  height: 15rem;
+  height: 12rem;
   position: relative;
-  flex-basis: 33.33%;
+  flex-basis: 50%;
   overflow: hidden;
 }
 
@@ -253,7 +270,7 @@ ul > li {
   content: '';
   display: block;
   width: 100%;
-  height: 6rem;
+  height: 5rem;
   margin: 0 auto;
   background: url(../img/tanah.png) no-repeat bottom center / contain;
   position: relative;
@@ -262,7 +279,7 @@ ul > li {
 }
 
 .mole {
-  width: 50%;
+  width: 75%;
   height: 75%;
   position: absolute;
   top: 200px;
@@ -272,7 +289,7 @@ ul > li {
 }
 
 .first-mole {
-  background: url(../img/tikus.png) no-repeat bottom center / cover;
+  background: url(../img/tikus.png) no-repeat bottom center / contain;
   z-index: 667;
 }
 
@@ -282,15 +299,15 @@ ul > li {
 }
 
 .mole-show-up .mole {
-  top: 45px;
+  top: 2.5rem;
 }
 
 #extra-mole {
   position: absolute;
   bottom: 0;
-  width: 30%;
+  width: 50%;
   height: 75%;
-  background: url('../img/tikus2.png') no-repeat center center / contain;
+  background: url('../img/tikus2.png') no-repeat bottom center / contain;
 }
 
 #extra-mole.mole-show-up {
@@ -303,6 +320,57 @@ ul > li {
   opacity: 0;
   z-index: -1;
   transition: left 1.5s linear, opacity 0.75s ease-in, z-index 0s ease-in 0.75s;
+}
+
+@media only screen and (min-width: 576px) {
+  html {
+    font-size: 16px;
+  }
+
+  ul > li {
+    text-align: left;
+  }
+
+  label {
+    font-size: 2rem;
+  }
+
+  .title {
+    font-size: 4rem;
+  }
+
+  .popup-container {
+    width: 50%;
+    height: 60%;
+  }
+
+  .options-container {
+    width: 40%;
+    padding: 2rem 2.5rem;
+  }
+
+  #information {
+    top: 1rem;
+    left: 1rem;
+    transform: unset;
+  }
+
+  .dirt {
+    flex-basis: 33.33%;
+    height: 15rem;
+  }
+
+  .dirt::after {
+    height: 6rem;
+  }
+
+  .mole {
+    width: 50%;
+  }
+
+  #extra-mole {
+    width: 30%;
+  }
 }
 
 @keyframes countdown {
